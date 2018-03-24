@@ -4,11 +4,15 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -18,12 +22,14 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 
-public class LedControlActivity extends AppCompatActivity {
+public class PillboxControlActivity extends AppCompatActivity {
 
-
+    // views
     private Button btnOn, btnOff, btnDisconnect;
     private TextView txtString, lumn;
     private SeekBar brightness;
@@ -45,10 +51,18 @@ public class LedControlActivity extends AppCompatActivity {
     // String for MAC address
     private static String address;
 
+    // code for box opened from Arduino
+    private String boxOpened = "o";
+    // code for box closed from Arduino
+    private String boxClosed = "c";
+
+    private SharedPreferences sp;
+    private Context mContext;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_led_control);
+        setContentView(R.layout.activity_pillbox_control);
 
         //Link the buttons and textViews to respective views
         btnOn = (Button) findViewById(R.id.on_button);
@@ -57,6 +71,9 @@ public class LedControlActivity extends AppCompatActivity {
         txtString = (TextView) findViewById(R.id.read);
         lumn = (TextView) findViewById(R.id.lumn);
         brightness = (SeekBar) findViewById(R.id.seekBar);
+
+        mContext = this;
+        sp = mContext.getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -72,6 +89,9 @@ public class LedControlActivity extends AppCompatActivity {
                         // extract string
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
                         txtString.setText("Data Received = " + dataInPrint);
+                        if (dataInPrint.equals(boxOpened)) {
+                            boxOpened();
+                        }
                         // clear all string data
                         recDataString.delete(0, recDataString.length());
                     }
@@ -89,6 +109,7 @@ public class LedControlActivity extends AppCompatActivity {
         btnOn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mConnectedThread.write("1");    // Send "1" via Bluetooth
+                boxOpened();
             }
         });
 
@@ -100,6 +121,7 @@ public class LedControlActivity extends AppCompatActivity {
             }
         });
 
+        // todo - use seekbar
         brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -156,6 +178,50 @@ public class LedControlActivity extends AppCompatActivity {
         } catch (IOException e2) {
             //insert code to deal with this
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // inflate menu
+        getMenuInflater().inflate(R.menu.menu_device_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // todo add settings here
+        int id = item.getItemId();
+
+        if (id == R.id.menu_homepage) {
+            startActivity(new Intent(mContext, HomeActivity.class));
+            return true;
+        } else if (id == R.id.menu_bluetooth) {
+            startActivity(new Intent(mContext, DeviceListActivity.class));
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    // todo
+    // save the time the box was opened
+    private void boxOpened() {
+        Date currentTime = Calendar.getInstance().getTime();
+        String currTimeStr = currentTime.toString();
+
+        // get number of dates in memory
+        int numDates = sp.getInt(getString(R.string.preference_num_dates), 0);
+
+        SharedPreferences.Editor editor = sp.edit();
+
+        // put date in memory
+        editor.putString(getString(R.string.preference_date) + numDates, currTimeStr);
+        editor.commit();
+
+        // add 1 to number of dates
+        numDates += 1;
+        editor.putInt(getString(R.string.preference_num_dates), numDates);
+        editor.commit();
     }
 
     // Checks that the Android device Bluetooth is available and prompts to be turned on if off
@@ -247,7 +313,7 @@ public class LedControlActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             //show a progress dialog
-            progress = ProgressDialog.show(LedControlActivity.this, "Connecting...", "Please wait!!!");
+            progress = ProgressDialog.show(PillboxControlActivity.this, "Connecting...", "Please wait!!!");
         }
 
         @Override

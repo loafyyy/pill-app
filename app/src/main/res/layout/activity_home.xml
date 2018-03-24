@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="com.led.led.HomeActivity">
+
+    <TextView
+        android:id="@+id/date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DATE" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/date_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="get date" />
+
+        <Button
+            android:id="@+id/show_dates_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="show dates" />
+
+        <Button
+            android:id="@+id/clear_dates_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="clear dates" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/pick_date_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select date" />
+
+        <Button
+            android:id="@+id/pick_time_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select time" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/home_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </ListView>
+</LinearLayout>

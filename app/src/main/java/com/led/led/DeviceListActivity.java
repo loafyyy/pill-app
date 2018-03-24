@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -64,6 +63,9 @@ public class DeviceListActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Enable the Up button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void getPairedDevicesList() {
@@ -106,7 +108,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
             // intent to go into LED control activity
             // put the deivce MAC address as an extra
-            Intent intent = new Intent(mContext, LedControlActivity.class);
+            Intent intent = new Intent(mContext, PillboxControlActivity.class);
             intent.putExtra(EXTRA_ADDRESS, address);
             startActivity(intent);
         }
@@ -114,25 +116,13 @@ public class DeviceListActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // inflate menu
-        getMenuInflater().inflate(R.menu.menu_device_list, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        // todo add settings here
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                startActivity(new Intent(mContext, HomeActivity.class));
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

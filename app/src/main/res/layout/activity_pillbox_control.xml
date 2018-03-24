@@ -4,31 +4,45 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.led.led.LedControlActivity">
+    tools:context="com.led.led.PillboxControlActivity">
 
     <TextView
         android:id="@+id/title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LED Control" />
+        android:text="Pill Box Control" />
 
-    <Button
-        android:id="@+id/on_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ON" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/off_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OFF" />
+        <Button
+            android:id="@+id/on_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OPEN" />
+
+        <Button
+            android:id="@+id/off_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CLOSE" />
+
+        <Button
+            android:id="@+id/disconnect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disconnect" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/title2_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Brightness" />
+        android:text="Slider" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -49,11 +63,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Read" />
-
-    <Button
-        android:id="@+id/disconnect_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Disconnect" />
 
 </LinearLayout>
