@@ -30,33 +30,23 @@
             android:text="CLOSE" />
 
         <Button
+            android:id="@+id/connect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="connect" />
+
+        <Button
             android:id="@+id/disconnect_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Disconnect" />
+            android:text="Discnct" />
 
     </LinearLayout>
 
-
     <TextView
-        android:id="@+id/title2_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Slider" />
-
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="false"
-        android:max="255"
-        android:progress="1" />
-
-    <TextView
-        android:id="@+id/lumn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Light" />
+        android:text="Read In:" />
 
     <TextView
         android:id="@+id/read"

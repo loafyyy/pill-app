@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class PillAlarmReceiver extends BroadcastReceiver {
 
@@ -49,9 +50,18 @@ public class PillAlarmReceiver extends BroadcastReceiver {
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
         // todo send alarm to pill box
+        sendBTSignalWrite(context, "a");
 
         // cancel intent after notification/alarm goes off
         PendingIntent fromIntent = PendingIntent.getBroadcast(context, broadcastId, intent, PendingIntent.FLAG_NO_CREATE);
         fromIntent.cancel();
+    }
+
+    private void sendBTSignalWrite(Context context, String string) {
+        Intent i = new Intent(context, BluetoothService.class);
+        // potentially add data to the intent
+        i.putExtra("BT string write", string);
+        context.startService(i);
+        Log.i("ALARM", "bt signal sent");
     }
 }
