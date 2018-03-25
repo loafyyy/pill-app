@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -63,9 +62,6 @@ public class DeviceListActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // Enable the Up button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void getPairedDevicesList() {
@@ -113,16 +109,4 @@ public class DeviceListActivity extends AppCompatActivity {
             startActivity(intent);
         }
     };
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                startActivity(new Intent(mContext, HomeActivity.class));
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

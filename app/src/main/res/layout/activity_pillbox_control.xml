@@ -35,12 +35,6 @@
             android:layout_height="wrap_content"
             android:text="connect" />
 
-        <Button
-            android:id="@+id/disconnect_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Discnct" />
-
     </LinearLayout>
 
     <TextView
@@ -53,5 +47,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Read" />
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop" />
 
 </LinearLayout>

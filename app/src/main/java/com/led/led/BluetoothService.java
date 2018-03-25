@@ -4,9 +4,9 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,12 +17,14 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 public class BluetoothService extends Service {
 
     // BT stuff
-    private boolean isBtConnected;
+    static public boolean isBtConnected;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
 
@@ -40,24 +42,7 @@ public class BluetoothService extends Service {
     final int handlerState = 0;
     private StringBuilder recDataString = new StringBuilder();
 
-    // BroadcastReceiver
-    public static final String RECEIVE_SERVICE = "BT_RECEIVE_SERVICE_WRITE";
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(RECEIVE_SERVICE)) {
-
-                String writeOut = intent.getStringExtra("BT string write");
-                if (writeOut == null) {
-                    Log.i("write out null", "!!!!");
-                }
-
-                mConnectedThread.write(writeOut);
-                Log.i("write out", writeOut);
-            }
-        }
-    };
-
+    private SharedPreferences sp;
 
     public BluetoothService() {
     }
@@ -66,6 +51,8 @@ public class BluetoothService extends Service {
     public void onCreate() {
         super.onCreate();
         Toast.makeText(this, "Bluetooh Service Created", Toast.LENGTH_SHORT).show();
+
+        sp = getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
         // set up handler
         bluetoothIn = new Handler() {
@@ -81,8 +68,7 @@ public class BluetoothService extends Service {
                     if (endOfLineIndex > 0) {
                         // extract string
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
-
-                        // TODO send BT signal
+                        Log.i("dataInPrint", dataInPrint);
                         sendBTSignal(dataInPrint);
 
                         // clear all string data
@@ -101,43 +87,45 @@ public class BluetoothService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "Bluetooh Service Started", Toast.LENGTH_SHORT).show();
-        
+
+        if (intent == null) {
+            return Service.START_NOT_STICKY;
+        }
+
         String writeOut = intent.getStringExtra("BT string write");
-        if (writeOut != null) {
+        if (writeOut != null && isBtConnected) {
+
+            /* todo
+            if (writeOut.equals("1")) {
+                boxOpened();
+            }*/
+
             mConnectedThread.write(writeOut);
-            Log.i("write out", writeOut);
+            Log.i("writeout", writeOut);
         }
 
         // connect to BT
         if (!isBtConnected) {
             address = intent.getStringExtra("address");
-            // todo handle error no address
             if (address == null) {
                 msg("no address BT Service");
+            } else {
+                // Call the class to connect Bluetooth
+                // ConnectBT is an Async Task
+                new ConnectBT().execute();
             }
-
-            // Call the class to connect Bluetooth
-            // ConnectBT is an Async Task
-            new ConnectBT().execute();
         }
 
-
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Toast.makeText(this, "Bluetooth Service Stopped", Toast.LENGTH_SHORT).show();
-        try {
-            //Don't leave Bluetooth sockets open when leaving activity
-            btSocket.close();
-        } catch (IOException e2) {
-            //insert code to deal with this
-        }
+        disconnect();
     }
 
-    // todo
     private void sendBTSignal(String string) {
         // send broadcast with updated numSteps
         Intent intent = new Intent(PillboxControlActivity.RECEIVE_SERVICE);
@@ -151,10 +139,30 @@ public class BluetoothService extends Service {
             msg("your phone doesn't support bluetooth");
         } else {
             if (!btAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                // todo startActivityForResult(enableBtIntent, 1);
+                // Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                // startActivityForResult(enableBtIntent, 1);
             }
         }
+    }
+
+    // save the time the box was opened
+    private void boxOpened() {
+        Date currentTime = Calendar.getInstance().getTime();
+        String currTimeStr = currentTime.toString();
+
+        // get number of dates in memory
+        int numDates = sp.getInt(getString(R.string.preference_num_dates), 0);
+
+        SharedPreferences.Editor editor = sp.edit();
+
+        // put date in memory
+        editor.putString(getString(R.string.preference_date) + numDates, currTimeStr);
+        editor.commit();
+
+        // add 1 to number of dates
+        numDates += 1;
+        editor.putInt(getString(R.string.preference_num_dates), numDates);
+        editor.commit();
     }
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
@@ -220,7 +228,6 @@ public class BluetoothService extends Service {
 
         @Override
         protected void onPreExecute() {
-            // todo show a progress dialog
             msg("Connecting to BT please wait !!!");
         }
 
